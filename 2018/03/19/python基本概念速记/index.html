@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://wizardforcel.gitbooks.io/python-quant-uqer/content/img/1.jpg">
 <meta property="og:image" content="https://wizardforcel.gitbooks.io/python-quant-uqer/content/img/3.jpg">
-<meta property="og:updated_time" content="2018-03-22T12:00:40.642Z">
+<meta property="og:updated_time" content="2018-03-22T12:23:49.172Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="python基本概念速记">
 <meta name="twitter:description" content="字符编码python3 的字符串用Unicode编码，一个字符2字节(16位，用4个十六进制)1234&amp;apos;中文&amp;apos;也可用十六进制表示str&amp;apos;\u4e2d\u6587&amp;apos;二者等价 为节省存储或者便于网络存储，需要把str转换成以字节为单位的bytes python对bytes类型的数据用带b前缀来表示1x = b&amp;apos;abc&amp;apos; str、bytes转换">
@@ -389,7 +389,7 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">赋值： a[0] = 1</span><br><span class="line">分片赋值： a[3:5] = list(&apos;sb&apos;)</span><br><span class="line">删除： del a[0] &lt;=&gt; a.pop(0)</span><br></pre></td></tr></table></figure>
 <ol>
-<li>序列的方法    序列.方法(参数)</li>
+<li>列表的方法    序列.方法(参数)</li>
 </ol>
 <ul>
 <li><p>追加元素 <code>a.append(&#39;s&#39;)</code>列表最后加一个</p>
@@ -403,6 +403,10 @@
 <li><p>排序 <code>a.sort()</code> </p>
 </li>
 </ul>
+<ol>
+<li>列表推导式</li>
+</ol>
+<p>[输出值 for 条件]<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">当满足条件时，输出一个值，最终形成一个列表：</span><br><span class="line">[x*x for x in range(10)]</span><br><span class="line"></span><br><span class="line">[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[x*x for x in range(10) if x%3==0]</span><br><span class="line"></span><br><span class="line">[0, 9, 36, 81]</span><br></pre></td></tr></table></figure></p>
 <h2 id="词典"><a href="#词典" class="headerlink" title="词典"></a>词典</h2><h3 id="dict"><a href="#dict" class="headerlink" title="dict()"></a>dict()</h3><p>关键字创建词典<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dict(name=&apos;wang&apos;, age=13)</span><br><span class="line"></span><br><span class="line">&#123;&apos;name&apos;: &apos;wang&apos;, &apos;age&apos;: 13&#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h3><p><img src="https://wizardforcel.gitbooks.io/python-quant-uqer/content/img/3.jpg" alt=""></p>
 
@@ -437,8 +441,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/19/浅探Pandas/" rel="next" title="浅探Pandas">
-                <i class="fa fa-chevron-left"></i> 浅探Pandas
+              <a href="/2018/03/19/量化python之Pandas/" rel="next" title="量化python之Pandas">
+                <i class="fa fa-chevron-left"></i> 量化python之Pandas
               </a>
             
           </div>
@@ -446,6 +450,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/22/量化python之NumPy/" rel="prev" title="量化python之NumPy">
+                量化python之NumPy <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -522,7 +530,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -544,7 +552,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="我们花了几个月的时间在QuantStart上重新测试利用Python和熊猫的各种交易策略。熊猫的向量化特性确保了大数据集上的某些操作非常迅速。然而，我们迄今研究过的向量化后退测试的形式在模拟交易执行的方式上存在一些缺点。在本系列文章中，我们将通过使用Python 构建一个事件驱动的回溯测试环境来讨论更现实的历史策略模拟方法。 事件驱动系统在我们深入研究这种倒退测试的发展之前，我们需要了解事件驱动系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python:基于事件驱动的回溯测试part1">
+<meta property="og:url" content="http://yoursite.com/2018/03/01/Python-基于事件驱动的回溯测试part1/index.html">
+<meta property="og:site_name" content="王老俺">
+<meta property="og:description" content="我们花了几个月的时间在QuantStart上重新测试利用Python和熊猫的各种交易策略。熊猫的向量化特性确保了大数据集上的某些操作非常迅速。然而，我们迄今研究过的向量化后退测试的形式在模拟交易执行的方式上存在一些缺点。在本系列文章中，我们将通过使用Python 构建一个事件驱动的回溯测试环境来讨论更现实的历史策略模拟方法。 事件驱动系统在我们深入研究这种倒退测试的发展之前，我们需要了解事件驱动系">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-28T02:55:55.561Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python:基于事件驱动的回溯测试part1">
+<meta name="twitter:description" content="我们花了几个月的时间在QuantStart上重新测试利用Python和熊猫的各种交易策略。熊猫的向量化特性确保了大数据集上的某些操作非常迅速。然而，我们迄今研究过的向量化后退测试的形式在模拟交易执行的方式上存在一些缺点。在本系列文章中，我们将通过使用Python 构建一个事件驱动的回溯测试环境来讨论更现实的历史策略模拟方法。 事件驱动系统在我们深入研究这种倒退测试的发展之前，我们需要了解事件驱动系">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/01/Python-基于事件驱动的回溯测试part1/"/>
+
+
+
+
+
+  <title>Python:基于事件驱动的回溯测试part1 | 王老俺</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王老俺</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/Python-基于事件驱动的回溯测试part1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王老俺">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王老俺">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python:基于事件驱动的回溯测试part1</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-01T10:46:21+08:00">
+                2018-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我们花了几个月的时间在QuantStart上重新测试利用Python和熊猫的各种交易策略。熊猫的向量化特性确保了大数据集上的某些操作非常迅速。然而，我们迄今研究过的向量化后退测试的形式在模拟交易执行的方式上存在一些缺点。在本系列文章中，我们将通过使用Python 构建一个事件驱动的回溯测试环境来讨论更现实的历史策略模拟方法。</p>
+<h1 id="事件驱动系统"><a href="#事件驱动系统" class="headerlink" title="事件驱动系统"></a>事件驱动系统</h1><p>在我们深入研究这种倒退测试的发展之前，我们需要了解事件驱动系统的概念。视频游戏为事件驱动的软件提供了一个自然的用例，并提供了一个直观的示例来进行探索。视频游戏有多个组件，可以在高帧率下以实时设置相互交互。这是通过在称为事件循环或游戏循环的“无限”循环内运行整组计算来处理的。</p>
+<p>在游戏循环的每个勾号处，都会调用一个函数来接收最近的事件，该事件将由游戏中的一些相应的先前动作产生。根据事件的性质（可能包括按键或鼠标单击），会采取一些后续操作，这会终止循环或生成一些其他事件。该过程将继续。这里是一些伪代码的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">while True:  # Run the loop forever</span><br><span class="line">    new_event = get_new_event()   # Get the latest event</span><br><span class="line"></span><br><span class="line">    # Based on the event type, perform an action</span><br><span class="line">    if new_event.type == &quot;LEFT_MOUSE_CLICK&quot;:</span><br><span class="line">        open_menu()</span><br><span class="line">    elif new_event.type == &quot;ESCAPE_KEY_PRESS&quot;:</span><br><span class="line">        quit_game()</span><br><span class="line">    elif new_event.type == &quot;UP_KEY_PRESS&quot;:</span><br><span class="line">        move_player_north()</span><br><span class="line">    # ... and many more events</span><br><span class="line"></span><br><span class="line">    redraw_screen()   # Update the screen to provide animation</span><br><span class="line">    tick(50)   # Wait 50 milliseconds</span><br></pre></td></tr></table></figure></p>
+<p>代码不断检查新事件，然后根据这些事件执行操作。特别是它允许实时响应处理的错觉，因为代码不断循环并检查事件。正如将会清楚的那样，这正是我们进行高频交易模拟所需要的。</p>
+<h1 id="为什么是事件驱动的回测框架？"><a href="#为什么是事件驱动的回测框架？" class="headerlink" title="为什么是事件驱动的回测框架？"></a>为什么是事件驱动的回测框架？</h1><p>事件驱动系统比矢量化方法提供了许多优点：</p>
+<ul>
+<li><p>代码重用。通过设计，一个事件驱动的测试仪可以用于历史回测和现场交易，同时最大限度地减少组件的切换。对于所有数据必须一次可用来进行统计分析的向量化后退测试者来说，情况并非如此。</p>
+</li>
+<li><p>前瞻性偏差。随着事件驱动的后退测试，没有前瞻偏见，因为市场数据收据被视为必须采取行动的“事件”。因此，可以用市场数据“滴灌”事件驱动的后台测试，并复制订单管理和投资组合系统的表现。</p>
+</li>
+<li><p>基于现实。事件驱动的退货测试可以根据订单的执行方式和交易成本进行重要定制。由于可以构建自定义交易处理程序，因此处理基本市场和限价订单，以及市场开放（MOO）和市场接近（MOC）都很简单。</p>
+</li>
+</ul>
+<p>虽然事件驱动系统具有许多优点，但与简单的矢量化系统相比，它们有两个主要缺点。首先，他们的实施和测试要复杂得多。有更多的“移动部件”导致引入错误的可能性更大。为了减轻这种适当的软件测试方法，例如测试驱动的开发，可以被采用。</p>
+<p>其次，与矢量化系统相比，它们执行速度较慢。进行数学计算时，无法利用最佳矢量化操作。我们将在后面的文章中讨论克服这些限制的方法。</p>
+<h1 id="事件驱动的Backtester概述"><a href="#事件驱动的Backtester概述" class="headerlink" title="事件驱动的Backtester概述"></a>事件驱动的Backtester概述</h1><p>为了将事件驱动的方法应用于后测系统，有必要定义我们将处理特定任务的组件（或对象）：</p>
+<ul>
+<li><p>事件。这Event是事件驱动系统的基本单位。它包含决定如何在事件循环内处理的类型（如“市场”，“信号”，“订单”或“填充”）。</p>
+</li>
+<li><p>事件队列。事件队列是内存中的Python队列对象，用于存储由软件其余部分生成的所有事件子类对象。</p>
+</li>
+<li>DataHandler。 这DataHandler是一个抽象基类（ABC），它提供了一个处理历史数据或实时市场数据的接口。这提供了显着的灵活性，因为战略和投资组合模块可以在两种方法之间重复使用。DataHandler会在系统的MarketEvent每个心跳线上产生一个新的（见下文）</li>
+<li>策略 - 这Strategy也是一种ABC，它提供了获取市场数据和生成相应的SignalEvent的接口，最终由Portfolio对象使用。SignalEvent包含股票代码，方向（LONG或SHORT）和时间戳。</li>
+<li>投资组合 - 这是一个ABC，它处理与战略的当前和随后头寸相关的订单管理。它还对投资组合进行风险管理，包括行业风险敞口和头寸规模。在更复杂的实施中，这可以委派给RiskManagement类。在Portfolio从队列中取出SignalEvents并产生被添加到队列OrderEvents。</li>
+<li>ExecutionHandler - ExecutionHandler模拟与经纪商的连接。处理程序的工作是从Queue中接收OrderEvents并执行它们，或者通过模拟方法或与肝脏经纪人的实际连接。一旦订单被执行，处理程序创建FillEvents，它描述实际交易的内容，包括费用，佣金和滑点（如果建模）。</li>
+<li>循环 - 所有这些组件都包装在正确处理所有事件类型的事件循环中，并将它们路由到适当的组件。<br>这是一个交易引擎的基本模型。有很大的扩展空间，特别是在如何Portfolio使用它们方面。另外，不同的交易成本模型也可能被抽象为他们自己的类层次结构。在这个阶段，它会在这一系列文章中引入不必要的复杂性，所以我们目前不会进一步讨论它。在后面的教程中，我们可能会扩展系统以包含更多的现实主义。</li>
+</ul>
+<p>下面是一段Python代码，演示了backtester在实践中的工作原理。代码中存在两个循环。外环用于给后测人员一个心跳。对于实时交易，这是调查新市场数据的频率。对于回溯测试策略来说，这并不是严格必要的，因为后退测试人员使用滴液形式提供的市场数据（请参见bars.update_bars()行）。</p>
+<p>内部循环实际上处理来自events队列对象的事件。特定的事件被委托给相应的组件，随后新的事件被添加到队列中。当事件队列为空时，心跳循环继续：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"># Declare the components with respective parameters</span><br><span class="line">bars = DataHandler(..)</span><br><span class="line">strategy = Strategy(..)</span><br><span class="line">port = Portfolio(..)</span><br><span class="line">broker = ExecutionHandler(..)</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    # Update the bars (specific backtest code, as opposed to live trading)</span><br><span class="line">    if bars.continue_backtest == True:</span><br><span class="line">        bars.update_bars()</span><br><span class="line">    else:</span><br><span class="line">        break</span><br><span class="line">    </span><br><span class="line">    # Handle the events</span><br><span class="line">    while True:</span><br><span class="line">        try:</span><br><span class="line">            event = events.get(False)</span><br><span class="line">        except Queue.Empty:</span><br><span class="line">            break</span><br><span class="line">        else:</span><br><span class="line">            if event is not None:</span><br><span class="line">                if event.type == &apos;MARKET&apos;:</span><br><span class="line">                    strategy.calculate_signals(event)</span><br><span class="line">                    port.update_timeindex(event)</span><br><span class="line"></span><br><span class="line">                elif event.type == &apos;SIGNAL&apos;:</span><br><span class="line">                    port.update_signal(event)</span><br><span class="line"></span><br><span class="line">                elif event.type == &apos;ORDER&apos;:</span><br><span class="line">                    broker.execute_order(event)</span><br><span class="line"></span><br><span class="line">                elif event.type == &apos;FILL&apos;:</span><br><span class="line">                    port.update_fill(event)</span><br><span class="line"></span><br><span class="line">    # 10-Minute heartbeat</span><br><span class="line">    time.sleep(10*60)</span><br></pre></td></tr></table></figure>
+<p>这是如何设计一个事件驱动的backtester的基本轮廓。在接下来的文章中我们将讨论事件的类层次结构。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/08/第一篇文章/" rel="prev" title="第一篇文章">
+                第一篇文章 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">王老俺</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#事件驱动系统"><span class="nav-number">1.</span> <span class="nav-text">事件驱动系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么是事件驱动的回测框架？"><span class="nav-number">2.</span> <span class="nav-text">为什么是事件驱动的回测框架？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事件驱动的Backtester概述"><span class="nav-number">3.</span> <span class="nav-text">事件驱动的Backtester概述</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王老俺</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

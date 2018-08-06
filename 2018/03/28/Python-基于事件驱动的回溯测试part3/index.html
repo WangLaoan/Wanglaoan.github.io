@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在本系列的前两篇文章中，我们讨论了事件驱动的后向测试系统以及Event对象的类层次结构。在本文中，我们将考虑如何利用市场数据，无论是在历史回溯测试环境中还是在实时交易执行中。 我们的一个事件驱动交易系统的目标是尽量减少backtesting元素和live执行元素之间的代码重复。理想情况下，利用相同的信号生成方法和投资组合管理组件进行历史测试和实时交易是最佳选择。为了实现这一点Strategy，生成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python:基于事件驱动的回溯测试part3">
+<meta property="og:url" content="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part3/index.html">
+<meta property="og:site_name" content="王老俺">
+<meta property="og:description" content="在本系列的前两篇文章中，我们讨论了事件驱动的后向测试系统以及Event对象的类层次结构。在本文中，我们将考虑如何利用市场数据，无论是在历史回溯测试环境中还是在实时交易执行中。 我们的一个事件驱动交易系统的目标是尽量减少backtesting元素和live执行元素之间的代码重复。理想情况下，利用相同的信号生成方法和投资组合管理组件进行历史测试和实时交易是最佳选择。为了实现这一点Strategy，生成">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-29T02:44:17.865Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python:基于事件驱动的回溯测试part3">
+<meta name="twitter:description" content="在本系列的前两篇文章中，我们讨论了事件驱动的后向测试系统以及Event对象的类层次结构。在本文中，我们将考虑如何利用市场数据，无论是在历史回溯测试环境中还是在实时交易执行中。 我们的一个事件驱动交易系统的目标是尽量减少backtesting元素和live执行元素之间的代码重复。理想情况下，利用相同的信号生成方法和投资组合管理组件进行历史测试和实时交易是最佳选择。为了实现这一点Strategy，生成">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part3/"/>
+
+
+
+
+
+  <title>Python:基于事件驱动的回溯测试part3 | 王老俺</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王老俺</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王老俺">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王老俺">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python:基于事件驱动的回溯测试part3</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T10:59:54+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在本系列的前两篇文章中，我们讨论了事件驱动的后向测试系统以及Event对象的类层次结构。在本文中，我们将考虑如何利用市场数据，无论是在历史回溯测试环境中还是在实时交易执行中。</p>
+<p>我们的一个事件驱动交易系统的目标是尽量减少backtesting元素和live执行元素之间的代码重复。理想情况下，利用相同的信号生成方法和投资组合管理组件进行历史测试和实时交易是最佳选择。为了实现这一点Strategy，生成信号的Portfolio对象以及基于它们提供订单的对象必须使用与历史和实时运行的市场订阅源相同的接口。</p>
+<p>这激发了基于DataHandler对象的类层次结构的概念，它为所有的子类提供了一个为市场数据提供给系统内其余组件的接口。通过这种方式，任何子类数据处理程序都可以“换出”，而不会影响策略或投资组合计算。</p>
+<p>具体的例子可以子类包括HistoricCSVDataHandler，QuandlDataHandler，SecuritiesMasterDataHandler，InteractiveBrokersMarketFeedDataHandler等等。在这个教程中，我们只打算考虑了历史性的CSV数据处理程序的创建，这将在盘中加载CSV数据对股市开低-高-关闭批量，多OpenInterest集的酒吧。这可以被用来“滴进料”上的杆通过杆基础数据到Strategy和Portfolio类对系统的每一次心跳，从而避免了先行偏压。</p>
+<p>第一项任务是导入必要的库。具体来说，我们要导入熊猫和抽象基类工具。由于DataHandler生成MarketEvent，因此我们还需要event.py按照上一教程中的描述进行导入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># data.py</span><br><span class="line"></span><br><span class="line">import datetime</span><br><span class="line">import os, os.path</span><br><span class="line">import pandas as pd</span><br><span class="line"></span><br><span class="line">from abc import ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line">from event import MarketEvent</span><br></pre></td></tr></table></figure></p>
+<p>这DataHandler是一个抽象基类（ABC），这意味着不可能直接实例化一个实例。只有子类可能被实例化。其基本原理是ABC提供了一个接口，所有后续的DataHandler子类必须遵守，从而确保与其他类通信的类的兼容性。</p>
+<p>我们利用这个<strong>metaclass</strong>属性让Python知道这是一个ABC。另外，我们使用@abstractmethod装饰器让Python知道该方法将在子类中重写（这与C ++中的纯虚方法相同）。</p>
+<p>两种感兴趣的方法是get_latest_bars和update_bars。前者返回最后的N来自当前心跳时间戳，这对于Strategy类中所需的滚动计算非常有用。后一种方法提供了一种“点滴进给”机制，用于将条形信息放置在严格禁止先行偏差的新数据结构上。注意，如果发生类的尝试实例化，将会引发异常：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"># data.py</span><br><span class="line"></span><br><span class="line">class DataHandler(object):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    DataHandler is an abstract base class providing an interface for</span><br><span class="line">    all subsequent (inherited) data handlers (both live and historic).</span><br><span class="line"></span><br><span class="line">    The goal of a (derived) DataHandler object is to output a generated</span><br><span class="line">    set of bars (OLHCVI) for each symbol requested. </span><br><span class="line"></span><br><span class="line">    This will replicate how a live strategy would function as current</span><br><span class="line">    market data would be sent &quot;down the pipe&quot;. Thus a historic and live</span><br><span class="line">    system will be treated identically by the rest of the backtesting suite.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    __metaclass__ = ABCMeta</span><br><span class="line"></span><br><span class="line">    @abstractmethod</span><br><span class="line">    def get_latest_bars(self, symbol, N=1):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Returns the last N bars from the latest_symbol list,</span><br><span class="line">        or fewer if less bars are available.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        raise NotImplementedError(&quot;Should implement get_latest_bars()&quot;)</span><br><span class="line"></span><br><span class="line">    @abstractmethod</span><br><span class="line">    def update_bars(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Pushes the latest bar to the latest symbol structure</span><br><span class="line">        for all symbols in the symbol list.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        raise NotImplementedError(&quot;Should implement update_bars()&quot;)</span><br></pre></td></tr></table></figure></p>
+<p>随着DataHandler农行指定的下一个步骤是创建一个历史性的CSV文件的处理程序。特别是HistoricCSVDataHandler将采用多个CSV文件，每个符号一个，并将它们转换为熊猫数据框的字典。</p>
+<p>数据处理程序需要几个参数，即用于推送MarketEvent信息的事件队列，CSV文件的绝对路径和符号列表。这是该课程的初始化：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"># data.py</span><br><span class="line"></span><br><span class="line">class HistoricCSVDataHandler(DataHandler):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    HistoricCSVDataHandler is designed to read CSV files for</span><br><span class="line">    each requested symbol from disk and provide an interface</span><br><span class="line">    to obtain the &quot;latest&quot; bar in a manner identical to a live</span><br><span class="line">    trading interface. </span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    def __init__(self, events, csv_dir, symbol_list):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Initialises the historic data handler by requesting</span><br><span class="line">        the location of the CSV files and a list of symbols.</span><br><span class="line"></span><br><span class="line">        It will be assumed that all files are of the form</span><br><span class="line">        &apos;symbol.csv&apos;, where symbol is a string in the list.</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        events - The Event Queue.</span><br><span class="line">        csv_dir - Absolute directory path to the CSV files.</span><br><span class="line">        symbol_list - A list of symbol strings.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        self.events = events</span><br><span class="line">        self.csv_dir = csv_dir</span><br><span class="line">        self.symbol_list = symbol_list</span><br><span class="line"></span><br><span class="line">        self.symbol_data = &#123;&#125;</span><br><span class="line">        self.latest_symbol_data = &#123;&#125;</span><br><span class="line">        self.continue_backtest = True       </span><br><span class="line"></span><br><span class="line">        self._open_convert_csv_files()</span><br></pre></td></tr></table></figure></p>
+<p>它会隐式地尝试打开格式为“SYMBOL.csv”的文件，其中符号是股票代码。这些文件的格式与DTN IQFeed供应商提供的格式相匹配，但很容易修改以处理其他数据格式。文件的打开由_open_convert_csv_files下面的方法处理。</p>
+<p>在内部使用熊猫作为数据存储的好处之一HistoricCSVDataHandler是可以将所有正在跟踪的符号的索引合并在一起。这允许缺失的数据点在这些间隙内向前，向后或内插填充，从而可以在条到条的基础上比较代价。例如，这对于平均回复策略是必要的。注意在组合所有符号的索引时使用union和reindex方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># data.py</span><br><span class="line"></span><br><span class="line">    def _open_convert_csv_files(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Opens the CSV files from the data directory, converting</span><br><span class="line">        them into pandas DataFrames within a symbol dictionary.</span><br><span class="line"></span><br><span class="line">        For this handler it will be assumed that the data is</span><br><span class="line">        taken from DTN IQFeed. Thus its format will be respected.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        comb_index = None</span><br><span class="line">        for s in self.symbol_list:</span><br><span class="line">            # Load the CSV file with no header information, indexed on date</span><br><span class="line">            self.symbol_data[s] = pd.io.parsers.read_csv(</span><br><span class="line">                                      os.path.join(self.csv_dir, &apos;%s.csv&apos; % s),</span><br><span class="line">                                      header=0, index_col=0, </span><br><span class="line">                                      names=[&apos;datetime&apos;,&apos;open&apos;,&apos;low&apos;,&apos;high&apos;,&apos;close&apos;,&apos;volume&apos;,&apos;oi&apos;]</span><br><span class="line">                                  )</span><br><span class="line"></span><br><span class="line">            # Combine the index to pad forward values</span><br><span class="line">            if comb_index is None:</span><br><span class="line">                comb_index = self.symbol_data[s].index</span><br><span class="line">            else:</span><br><span class="line">                comb_index.union(self.symbol_data[s].index)</span><br><span class="line"></span><br><span class="line">            # Set the latest symbol_data to None</span><br><span class="line">            self.latest_symbol_data[s] = []</span><br><span class="line"></span><br><span class="line">        # Reindex the dataframes</span><br><span class="line">        for s in self.symbol_list:</span><br><span class="line">            self.symbol_data[s] = self.symbol_data[s].reindex(index=comb_index, method=&apos;pad&apos;).iterrows()</span><br></pre></td></tr></table></figure></p>
+<p>该_get_new_bar方法创建一个生成器来提供条形数据的格式化版本。这意味着随后对方法的调用将产生一个新的条，直到达到符号数据的末尾：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># data.py</span><br><span class="line"></span><br><span class="line">    def _get_new_bar(self, symbol):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Returns the latest bar from the data feed as a tuple of </span><br><span class="line">        (sybmbol, datetime, open, low, high, close, volume).</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        for b in self.symbol_data[symbol]:</span><br><span class="line">            yield tuple([symbol, datetime.datetime.strptime(b[0], &apos;%Y-%m-%d %H:%M:%S&apos;), </span><br><span class="line">                        b[1][0], b[1][1], b[1][2], b[1][3], b[1][4]])</span><br></pre></td></tr></table></figure></p>
+<p>第一个DataHandler要实现的抽象方法是get_latest_bars。这个方法只是提供最后一个N的列表酒吧从latest_symbol_data结构。设置 N=1 允许检索当前栏（包装在列表中）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># data.py</span><br><span class="line"></span><br><span class="line">    def get_latest_bars(self, symbol, N=1):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Returns the last N bars from the latest_symbol list,</span><br><span class="line">        or N-k if less available.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        try:</span><br><span class="line">            bars_list = self.latest_symbol_data[symbol]</span><br><span class="line">        except KeyError:</span><br><span class="line">            print &quot;That symbol is not available in the historical data set.&quot;</span><br><span class="line">        else:</span><br><span class="line">            return bars_list[-N:]   </span><br><span class="line">```         </span><br><span class="line">最后一个方法，update_bars是第二个抽象方法DataHandler。它只是生成一个MarketEvent添加到队列中的数据，因为它将最新的条添加到latest_symbol_data：</span><br></pre></td></tr></table></figure></p>
+<h1 id="data-py"><a href="#data-py" class="headerlink" title="data.py"></a>data.py</h1><pre><code>def update_bars(self):
+    &quot;&quot;&quot;
+    Pushes the latest bar to the latest_symbol_data structure
+    for all symbols in the symbol list.
+    &quot;&quot;&quot;
+    for s in self.symbol_list:
+        try:
+            bar = self._get_new_bar(s).next()
+        except StopIteration:
+            self.continue_backtest = False
+        else:
+            if bar is not None:
+                self.latest_symbol_data[s].append(bar)
+    self.events.put(MarketEvent())
+</code></pre><p><code>`</code><br>因此，我们有一个DataHandler衍生对象，其余组件用它来跟踪市场数据。的Strategy，Portfolio和ExecutionHandler对象都需要目前的市场数据。因此它是有道理的集中，以避免存储重复。</p>
+<p>在下一篇文章中，我们将考虑Strategy类层次结构，并描述如何设计策略来处理多个符号，从而SignalEvent为Portfolio对象生成多个s 。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/28/Python-基于事件驱动的回溯测试part2/" rel="next" title="Python:基于事件驱动的回溯测试part2">
+                <i class="fa fa-chevron-left"></i> Python:基于事件驱动的回溯测试part2
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/28/Python-基于事件驱动的回溯测试part4/" rel="prev" title="Python:基于事件驱动的回溯测试part4">
+                Python:基于事件驱动的回溯测试part4 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">王老俺</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#data-py"><span class="nav-number">1.</span> <span class="nav-text">data.py</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王老俺</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

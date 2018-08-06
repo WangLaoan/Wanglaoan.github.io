@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在上一篇文章中，我们描述了事件驱动的后台测试的概念。本系列文章的其余部分将集中在构成整个系统的每个单独的类层次结构上。在本文中，我们将考虑事件以及它们如何用于在对象之间传递信息。 正如前一篇文章所讨论的那样，交易系统利用两个while循环 - 外部和内部循环。inner while循环处理来自内存队列的事件捕获，然后将这些事件路由到适当的组件以供后续操作。在这个基础设施中有四种类型的事件： Mar">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python:基于事件驱动的回溯测试part2">
+<meta property="og:url" content="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part2/index.html">
+<meta property="og:site_name" content="王老俺">
+<meta property="og:description" content="在上一篇文章中，我们描述了事件驱动的后台测试的概念。本系列文章的其余部分将集中在构成整个系统的每个单独的类层次结构上。在本文中，我们将考虑事件以及它们如何用于在对象之间传递信息。 正如前一篇文章所讨论的那样，交易系统利用两个while循环 - 外部和内部循环。inner while循环处理来自内存队列的事件捕获，然后将这些事件路由到适当的组件以供后续操作。在这个基础设施中有四种类型的事件： Mar">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-29T02:37:52.903Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python:基于事件驱动的回溯测试part2">
+<meta name="twitter:description" content="在上一篇文章中，我们描述了事件驱动的后台测试的概念。本系列文章的其余部分将集中在构成整个系统的每个单独的类层次结构上。在本文中，我们将考虑事件以及它们如何用于在对象之间传递信息。 正如前一篇文章所讨论的那样，交易系统利用两个while循环 - 外部和内部循环。inner while循环处理来自内存队列的事件捕获，然后将这些事件路由到适当的组件以供后续操作。在这个基础设施中有四种类型的事件： Mar">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part2/"/>
+
+
+
+
+
+  <title>Python:基于事件驱动的回溯测试part2 | 王老俺</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王老俺</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王老俺">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王老俺">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python:基于事件驱动的回溯测试part2</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T10:59:48+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在上一篇文章中，我们描述了事件驱动的后台测试的概念。本系列文章的其余部分将集中在构成整个系统的每个单独的类层次结构上。在本文中，我们将考虑事件以及它们如何用于在对象之间传递信息。</p>
+<p>正如前一篇文章所讨论的那样，交易系统利用两个while循环 - 外部和内部循环。inner while循环处理来自内存队列的事件捕获，然后将这些事件路由到适当的组件以供后续操作。在这个基础设施中有四种类型的事件：</p>
+<p>MarketEvent - 当外部while循环开始新的“心跳”时触发。当DataHandler对象接收到当前正在跟踪的任何符号的市场数据的新更新时发生。它用于触发Strategy产生新交易信号的对象。事件对象仅包含一个标识，它是市场事件，没有其他结构。<br>SignalEvent - 该Strategy对象利用市场数据创建新的SignalEvents。的SignalEvent包含一个股票代号，产生时，它为一个时间戳和方向（长或短）。该物件SignalEvent被该Portfolio物件用作如何交易的建议。<br>OrderEvent - 当一个Portfolio对象接收到SignalEvents时，它在投资组合的更广泛的背景下评估它们，就风险和头寸大小而言。这最终导致OrderEvents将被发送到一个ExecutionHandler。<br>FillEvent -当ExecutionHandler接收到一个OrderEvent它必须办理顺序。一旦订单交易完成，它就会生成一个FillEvent描述购买或销售成本以及交易成本（如费用或滑点）的描述。<br>父类被调用Event。它是一个基类，不提供任何功能或特定的接口。在稍后的实现中，Event对象可能会增加复杂性，因此我们通过创建类层次结构来进一步验证此类系统的设计。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># event.py</span><br><span class="line"></span><br><span class="line">class Event(object):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    Event is base class providing an interface for all subsequent </span><br><span class="line">    (inherited) events, that will trigger further events in the </span><br><span class="line">    trading infrastructure.   </span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    pass</span><br></pre></td></tr></table></figure>
+<p>在MarketEvent从继承Event和提供比在自识别，它是一个“市场”类型的事件更小。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># event.py</span><br><span class="line"></span><br><span class="line">class MarketEvent(Event):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    Handles the event of receiving a new market update with </span><br><span class="line">    corresponding bars.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Initialises the MarketEvent.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        self.type = &apos;MARKET&apos;</span><br></pre></td></tr></table></figure>
+<p>A SignalEvent需要一个股票代码，一个生成时间戳和一个方向，以建议一个Portfolio对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># event.py</span><br><span class="line"></span><br><span class="line">class SignalEvent(Event):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    Handles the event of sending a Signal from a Strategy object.</span><br><span class="line">    This is received by a Portfolio object and acted upon.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    </span><br><span class="line">    def __init__(self, symbol, datetime, signal_type):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Initialises the SignalEvent.</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        symbol - The ticker symbol, e.g. &apos;GOOG&apos;.</span><br><span class="line">        datetime - The timestamp at which the signal was generated.</span><br><span class="line">        signal_type - &apos;LONG&apos; or &apos;SHORT&apos;.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        </span><br><span class="line">        self.type = &apos;SIGNAL&apos;</span><br><span class="line">        self.symbol = symbol</span><br><span class="line">        self.datetime = datetime</span><br><span class="line">        self.signal_type = signal_type</span><br></pre></td></tr></table></figure>
+<p>这OrderEvent比a稍微复杂一些，SignalEvent因为除了前面提到的属性之外，它还包含数量字段SignalEvent。数量由Portfolio约束决定。此外，OrderEvent还有一个print_order()方法，用于在必要时将信息输出到控制台。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"># event.py</span><br><span class="line"></span><br><span class="line">class OrderEvent(Event):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    Handles the event of sending an Order to an execution system.</span><br><span class="line">    The order contains a symbol (e.g. GOOG), a type (market or limit),</span><br><span class="line">    quantity and a direction.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    def __init__(self, symbol, order_type, quantity, direction):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Initialises the order type, setting whether it is</span><br><span class="line">        a Market order (&apos;MKT&apos;) or Limit order (&apos;LMT&apos;), has</span><br><span class="line">        a quantity (integral) and its direction (&apos;BUY&apos; or</span><br><span class="line">        &apos;SELL&apos;).</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        symbol - The instrument to trade.</span><br><span class="line">        order_type - &apos;MKT&apos; or &apos;LMT&apos; for Market or Limit.</span><br><span class="line">        quantity - Non-negative integer for quantity.</span><br><span class="line">        direction - &apos;BUY&apos; or &apos;SELL&apos; for long or short.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        </span><br><span class="line">        self.type = &apos;ORDER&apos;</span><br><span class="line">        self.symbol = symbol</span><br><span class="line">        self.order_type = order_type</span><br><span class="line">        self.quantity = quantity</span><br><span class="line">        self.direction = direction</span><br><span class="line"></span><br><span class="line">    def print_order(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Outputs the values within the Order.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        print &quot;Order: Symbol=%s, Type=%s, Quantity=%s, Direction=%s&quot; % \</span><br><span class="line">            (self.symbol, self.order_type, self.quantity, self.direction)</span><br></pre></td></tr></table></figure></p>
+<p>这FillEvent是Event最复杂的。它包含订单填写时的时间戳，订单符号和交易执行时间，交易数量，实际购买价格和佣金。</p>
+<p>该佣金是使用盈透证券佣金计算的。对于美国API订单，该佣金每笔订单最低为1.30美元，根据交易规模是低于还是高于500单位的库存，统一费率为每股0.013美元或0.08美元。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"># event.py</span><br><span class="line"></span><br><span class="line">class FillEvent(Event):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    Encapsulates the notion of a Filled Order, as returned</span><br><span class="line">    from a brokerage. Stores the quantity of an instrument</span><br><span class="line">    actually filled and at what price. In addition, stores</span><br><span class="line">    the commission of the trade from the brokerage.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    def __init__(self, timeindex, symbol, exchange, quantity, </span><br><span class="line">                 direction, fill_cost, commission=None):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Initialises the FillEvent object. Sets the symbol, exchange,</span><br><span class="line">        quantity, direction, cost of fill and an optional </span><br><span class="line">        commission.</span><br><span class="line"></span><br><span class="line">        If commission is not provided, the Fill object will</span><br><span class="line">        calculate it based on the trade size and Interactive</span><br><span class="line">        Brokers fees.</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        timeindex - The bar-resolution when the order was filled.</span><br><span class="line">        symbol - The instrument which was filled.</span><br><span class="line">        exchange - The exchange where the order was filled.</span><br><span class="line">        quantity - The filled quantity.</span><br><span class="line">        direction - The direction of fill (&apos;BUY&apos; or &apos;SELL&apos;)</span><br><span class="line">        fill_cost - The holdings value in dollars.</span><br><span class="line">        commission - An optional commission sent from IB.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        </span><br><span class="line">        self.type = &apos;FILL&apos;</span><br><span class="line">        self.timeindex = timeindex</span><br><span class="line">        self.symbol = symbol</span><br><span class="line">        self.exchange = exchange</span><br><span class="line">        self.quantity = quantity</span><br><span class="line">        self.direction = direction</span><br><span class="line">        self.fill_cost = fill_cost</span><br><span class="line"></span><br><span class="line">        # Calculate commission</span><br><span class="line">        if commission is None:</span><br><span class="line">            self.commission = self.calculate_ib_commission()</span><br><span class="line">        else:</span><br><span class="line">            self.commission = commission</span><br><span class="line"></span><br><span class="line">    def calculate_ib_commission(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Calculates the fees of trading based on an Interactive</span><br><span class="line">        Brokers fee structure for API, in USD.</span><br><span class="line"></span><br><span class="line">        This does not include exchange or ECN fees.</span><br><span class="line"></span><br><span class="line">        Based on &quot;US API Directed Orders&quot;:</span><br><span class="line">        https://www.interactivebrokers.com/en/index.php?f=commission&amp;p=stocks2</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        full_cost = 1.3</span><br><span class="line">        if self.quantity &lt;= 500:</span><br><span class="line">            full_cost = max(1.3, 0.013 * self.quantity)</span><br><span class="line">        else: # Greater than 500</span><br><span class="line">            full_cost = max(1.3, 0.008 * self.quantity)</span><br><span class="line">        full_cost = min(full_cost, 0.5 / 100.0 * self.quantity * self.fill_cost)</span><br><span class="line">        return full_cost</span><br></pre></td></tr></table></figure>
+<p>在本系列的下一篇文章中，我们将考虑如何DataHandler通过相同的类接口开发允许历史回溯测试和实时交易的市场类别层次结构。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/28/Python-基于事件驱动的回溯测试part1/" rel="next" title="Python:基于事件驱动的回溯测试part1">
+                <i class="fa fa-chevron-left"></i> Python:基于事件驱动的回溯测试part1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/28/Python-基于事件驱动的回溯测试part3/" rel="prev" title="Python:基于事件驱动的回溯测试part3">
+                Python:基于事件驱动的回溯测试part3 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">王老俺</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王老俺</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="事件驱动的回溯实现的讨论先前已经考虑过事件循环，事件类层次结构和数据处理组件。在这篇文章中，将概述战略类层次结构。Strategy对象将市场数据作为输入并产生交易信号事件作为输出。 一个Strategy对象封装了对市场数据的所有计算，这些数据产生了对象的咨询信号Portfolio。在这个事件驱动型背景测试发展的阶段，没有指标或过滤器的概念，例如技术交易中发现的概念。这些也是创建类层次结构的不错选择">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python:基于事件驱动的回溯测试part4">
+<meta property="og:url" content="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part4/index.html">
+<meta property="og:site_name" content="王老俺">
+<meta property="og:description" content="事件驱动的回溯实现的讨论先前已经考虑过事件循环，事件类层次结构和数据处理组件。在这篇文章中，将概述战略类层次结构。Strategy对象将市场数据作为输入并产生交易信号事件作为输出。 一个Strategy对象封装了对市场数据的所有计算，这些数据产生了对象的咨询信号Portfolio。在这个事件驱动型背景测试发展的阶段，没有指标或过滤器的概念，例如技术交易中发现的概念。这些也是创建类层次结构的不错选择">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-29T02:47:43.450Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python:基于事件驱动的回溯测试part4">
+<meta name="twitter:description" content="事件驱动的回溯实现的讨论先前已经考虑过事件循环，事件类层次结构和数据处理组件。在这篇文章中，将概述战略类层次结构。Strategy对象将市场数据作为输入并产生交易信号事件作为输出。 一个Strategy对象封装了对市场数据的所有计算，这些数据产生了对象的咨询信号Portfolio。在这个事件驱动型背景测试发展的阶段，没有指标或过滤器的概念，例如技术交易中发现的概念。这些也是创建类层次结构的不错选择">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part4/"/>
+
+
+
+
+
+  <title>Python:基于事件驱动的回溯测试part4 | 王老俺</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王老俺</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王老俺">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王老俺">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python:基于事件驱动的回溯测试part4</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T10:59:57+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>事件驱动的回溯实现的讨论先前已经考虑过事件循环，事件类层次结构和数据处理组件。在这篇文章中，将概述战略类层次结构。Strategy对象将市场数据作为输入并产生交易信号事件作为输出。</p>
+<p>一个Strategy对象封装了对市场数据的所有计算，这些数据产生了对象的咨询信号Portfolio。在这个事件驱动型背景测试发展的阶段，没有指标或过滤器的概念，例如技术交易中发现的概念。这些也是创建类层次结构的不错选择，但超出了本文的范围。</p>
+<p>策略层次结构相对简单，因为它由一个抽象基类和一个用于生成SignalEvent对象的纯虚拟方法组成。为了创建Strategy层次结构，需要导入NumPy，pandas，Queue对象，抽象基类工具和SignalEvent：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># strategy.py</span><br><span class="line"></span><br><span class="line">import datetime</span><br><span class="line">import numpy as np</span><br><span class="line">import pandas as pd</span><br><span class="line">import Queue</span><br><span class="line"></span><br><span class="line">from abc import ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line">from event import SignalEvent</span><br></pre></td></tr></table></figure></p>
+<p>所述Strategy抽象基类只定义一个纯虚calculate_signals方法。在派生类中，这用于处理SignalEvent基于市场数据更新的对象生成：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># strategy.py</span><br><span class="line"></span><br><span class="line">class Strategy(object):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    Strategy is an abstract base class providing an interface for</span><br><span class="line">    all subsequent (inherited) strategy handling objects.</span><br><span class="line"></span><br><span class="line">    The goal of a (derived) Strategy object is to generate Signal</span><br><span class="line">    objects for particular symbols based on the inputs of Bars </span><br><span class="line">    (OLHCVI) generated by a DataHandler object.</span><br><span class="line"></span><br><span class="line">    This is designed to work both with historic and live data as</span><br><span class="line">    the Strategy object is agnostic to the data source,</span><br><span class="line">    since it obtains the bar tuples from a queue object.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    __metaclass__ = ABCMeta</span><br><span class="line"></span><br><span class="line">    @abstractmethod</span><br><span class="line">    def calculate_signals(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Provides the mechanisms to calculate the list of signals.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        raise NotImplementedError(&quot;Should implement calculate_signals()&quot;)</span><br></pre></td></tr></table></figure></p>
+<p>StrategyABC 的定义很简单。我们的第一个子类化Strategy对象的例子是使用购买和持有策略来创建BuyAndHoldStrategy类。这在特定日期的特定安全性中很长时间，并将其保留在投资组合中。因此每个安全产生的信号只有一个。</p>
+<p>构造函数（<strong>init</strong>）需要bars市场数据处理程序和events事件队列对象：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># strategy.py</span><br><span class="line"></span><br><span class="line">class BuyAndHoldStrategy(Strategy):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    This is an extremely simple strategy that goes LONG all of the </span><br><span class="line">    symbols as soon as a bar is received. It will never exit a position.</span><br><span class="line"></span><br><span class="line">    It is primarily used as a testing mechanism for the Strategy class</span><br><span class="line">    as well as a benchmark upon which to compare other strategies.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    def __init__(self, bars, events):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Initialises the buy and hold strategy.</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        bars - The DataHandler object that provides bar information</span><br><span class="line">        events - The Event Queue object.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        self.bars = bars</span><br><span class="line">        self.symbol_list = self.bars.symbol_list</span><br><span class="line">        self.events = events</span><br><span class="line"></span><br><span class="line">        # Once buy &amp; hold signal is given, these are set to True</span><br><span class="line">        self.bought = self._calculate_initial_bought()</span><br></pre></td></tr></table></figure></p>
+<p>在初始化的BuyAndHoldStrategy该bought字典成员有一组为都设置为False每个符号键。一旦资产已经“渴望”，那么这被设置为“真”。基本上，这使战略能够知道它是否“在市场上”<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># strategy.py</span><br><span class="line"></span><br><span class="line">    def _calculate_initial_bought(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Adds keys to the bought dictionary for all symbols</span><br><span class="line">        and sets them to False.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        bought = &#123;&#125;</span><br><span class="line">        for s in self.symbol_list:</span><br><span class="line">            bought[s] = False</span><br><span class="line">        return bought</span><br></pre></td></tr></table></figure></p>
+<p>该calculate_signals纯虚方法在此类具体实现。该方法遍历符号列表中的所有符号，并从bars数据处理程序中检索最新的条形图。然后检查该符号是否已被“购买”（即我们是否在市场上购买此符号），是否创建单个SignalEvent对象。然后将其放置在events队列中，并且bought对于此特定符号键，字典正确更新为True：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># strategy.py</span><br><span class="line"></span><br><span class="line">    def calculate_signals(self, event):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        For &quot;Buy and Hold&quot; we generate a single signal per symbol</span><br><span class="line">        and then no additional signals. This means we are </span><br><span class="line">        constantly long the market from the date of strategy</span><br><span class="line">        initialisation.</span><br><span class="line"></span><br><span class="line">        Parameters</span><br><span class="line">        event - A MarketEvent object. </span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        if event.type == &apos;MARKET&apos;:</span><br><span class="line">            for s in self.symbol_list:</span><br><span class="line">                bars = self.bars.get_latest_bars(s, N=1)</span><br><span class="line">                if bars is not None and bars != []:</span><br><span class="line">                    if self.bought[s] == False:</span><br><span class="line">                        # (Symbol, Datetime, Type = LONG, SHORT or EXIT)</span><br><span class="line">                        signal = SignalEvent(bars[0][0], bars[0][1], &apos;LONG&apos;)</span><br><span class="line">                        self.events.put(signal)</span><br><span class="line">                        self.bought[s] = True</span><br></pre></td></tr></table></figure></p>
+<p>这显然是一个简单的策略，但它足以证明事件驱动策略层次结构的本质。在随后的文章中，我们会考虑更复杂的策略，例如对贸易。在下一篇文章中，我们将考虑如何创建一个Portfolio可以追踪盈利和亏损（“PnL”）的头寸的层次结构。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/28/Python-基于事件驱动的回溯测试part3/" rel="next" title="Python:基于事件驱动的回溯测试part3">
+                <i class="fa fa-chevron-left"></i> Python:基于事件驱动的回溯测试part3
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/28/Python-基于事件驱动的回溯测试part5/" rel="prev" title="Python:基于事件驱动的回溯测试part5">
+                Python:基于事件驱动的回溯测试part5 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">王老俺</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王老俺</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

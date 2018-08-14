@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="mysql," />
 
 
 
@@ -79,14 +79,18 @@
 
 
 
+<meta name="description" content="关系型数据库关系结构本质：使用二维表格存储数据 常见的 Orancle: 甲骨文 DB2:IBM SQL Server: 微软 Sybase: 塞尔斯 MySQL: 甲骨文  RDBMS数据库服务器管理员–仓库的关系  RMBMS = 管理员(manager) + 仓库(database) database = N个table table： 表结构：定义表的列名和类型 表记录：一行一行的记录！表结">
+<meta name="keywords" content="mysql">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql基础概念">
 <meta property="og:url" content="http://yoursite.com/2018/08/14/mysql基础概念/index.html">
 <meta property="og:site_name" content="王老俺">
+<meta property="og:description" content="关系型数据库关系结构本质：使用二维表格存储数据 常见的 Orancle: 甲骨文 DB2:IBM SQL Server: 微软 Sybase: 塞尔斯 MySQL: 甲骨文  RDBMS数据库服务器管理员–仓库的关系  RMBMS = 管理员(manager) + 仓库(database) database = N个table table： 表结构：定义表的列名和类型 表记录：一行一行的记录！表结">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-14T03:12:31.722Z">
+<meta property="og:updated_time" content="2018-08-14T10:21:42.701Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mysql基础概念">
+<meta name="twitter:description" content="关系型数据库关系结构本质：使用二维表格存储数据 常见的 Orancle: 甲骨文 DB2:IBM SQL Server: 微软 Sybase: 塞尔斯 MySQL: 甲骨文  RDBMS数据库服务器管理员–仓库的关系  RMBMS = 管理员(manager) + 仓库(database) database = N个table table： 表结构：定义表的列名和类型 表记录：一行一行的记录！表结">
 
 
 
@@ -299,6 +303,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -326,7 +352,35 @@
       
 
       
-        
+        <h1 id="关系型数据库"><a href="#关系型数据库" class="headerlink" title="关系型数据库"></a>关系型数据库</h1><p>关系结构本质：使用二维表格存储数据</p>
+<h1 id="常见的"><a href="#常见的" class="headerlink" title="常见的"></a>常见的</h1><ul>
+<li>Orancle: 甲骨文</li>
+<li>DB2:IBM</li>
+<li>SQL Server: 微软</li>
+<li>Sybase: 塞尔斯</li>
+<li>MySQL: 甲骨文</li>
+</ul>
+<h1 id="RDBMS"><a href="#RDBMS" class="headerlink" title="RDBMS"></a>RDBMS</h1><p>数据库服务器<br>管理员–仓库的关系</p>
+<ul>
+<li>RMBMS = 管理员(manager) + 仓库(database)</li>
+<li>database = N个table</li>
+<li>table：<ol>
+<li>表结构：定义表的列名和类型</li>
+<li>表记录：一行一行的记录！<h1 id="表结构-vs-表记录"><a href="#表结构-vs-表记录" class="headerlink" title="表结构 vs 表记录"></a>表结构 vs 表记录</h1></li>
+</ol>
+</li>
+</ul>
+<h1 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h1><ul>
+<li>int</li>
+<li>double <code>double(5, 2) 最多5位，必有2位小数</code></li>
+<li>decimal 十进制、钱相关</li>
+<li>char 固长字符串(自动补足) 最大255 char(255) </li>
+<li>varchar 可变长度字符串类型 <code>varchar(65535)</code> ps.需要额外空间记录长度</li>
+<li>date 日期类型 格式<code>yyyy-MM-dd</code></li>
+<li>time 时间类型 格式<code>hh:mm:aa</code></li>
+<li>timestamp 时间戳类型</li>
+</ul>
+
       
     </div>
     
@@ -340,6 +394,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
+        </div>
       
 
       
@@ -410,8 +470,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -448,7 +517,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">14</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -471,6 +540,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关系型数据库"><span class="nav-number">1.</span> <span class="nav-text">关系型数据库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见的"><span class="nav-number">2.</span> <span class="nav-text">常见的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RDBMS"><span class="nav-number">3.</span> <span class="nav-text">RDBMS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#表结构-vs-表记录"><span class="nav-number">4.</span> <span class="nav-text">表结构 vs 表记录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据类型"><span class="nav-number">5.</span> <span class="nav-text">数据类型</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

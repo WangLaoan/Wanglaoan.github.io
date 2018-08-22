@@ -259,6 +259,125 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/14/mysql命令速记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王老俺">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王老俺">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/14/mysql命令速记/" itemprop="url">mysql命令速记</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-14T18:52:21+08:00">
+                2018-08-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/14/mysql基础概念/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -366,20 +485,69 @@
 <li>database = N个table</li>
 <li>table：<ol>
 <li>表结构：定义表的列名和类型</li>
-<li>表记录：一行一行的记录！<h1 id="表结构-vs-表记录"><a href="#表结构-vs-表记录" class="headerlink" title="表结构 vs 表记录"></a>表结构 vs 表记录</h1></li>
+<li>表记录：一行一行的记录！</li>
 </ol>
 </li>
 </ul>
-<h1 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h1><ul>
-<li>int</li>
-<li>double <code>double(5, 2) 最多5位，必有2位小数</code></li>
-<li>decimal 十进制、钱相关</li>
+<h1 id="SQL"><a href="#SQL" class="headerlink" title="SQL"></a>SQL</h1><h2 id="是什么？"><a href="#是什么？" class="headerlink" title="是什么？"></a>是什么？</h2><p>结构化查询语言（Structure Query Language），客户端用来操作服务器</p>
+<h2 id="标准"><a href="#标准" class="headerlink" title="标准"></a>标准</h2><p>由ISO制定标准，对DMS的统一操作方式，如SQL99</p>
+<h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ol>
+<li>DDL(Data Definition Language)<br> 增删改 库、表结构！</li>
+<li>DML(Data Manipulation Language)<br> 增删改 表记录！</li>
+<li>DCL(Data Control  Language)<br> 访问权限、安全级别、用户创建</li>
+<li>DQL(Data Query Language)<br> 查询记录</li>
+</ol>
+<h2 id="DDL"><a href="#DDL" class="headerlink" title="DDL"></a>DDL</h2><ol>
+<li>数据库</li>
+</ol>
+<ul>
+<li>SHOW DATABASES 查看所有数据库</li>
+<li>USE　&lt;数据库名&gt;</li>
+<li>CREATE DATABASE [IF NOT EXISTS] mydb1 [charset=utf-8] [可选，使用不写中括号] 创建数据库</li>
+<li>DROP DATABASE [if exits] mydb1 删除数据库</li>
+<li>ALTER DATABASE mydb1 CHARACTER SET utf-8 </li>
+</ul>
+<ol>
+<li>数据类型</li>
+</ol>
+<ul>
+<li>int 整数</li>
+<li>double <code>double(5, 2) 最多5位，必有2位小数</code> 浮点数</li>
+<li>decimal 浮点数/十进制、钱相关</li>
 <li>char 固长字符串(自动补足) 最大255 char(255) </li>
 <li>varchar 可变长度字符串类型 <code>varchar(65535)</code> ps.需要额外空间记录长度</li>
+<li>text(标准使用：clob) 字符串类型      最大 2^32 = 4GB</li>
+<li>blob 字节类型</li>
 <li>date 日期类型 格式<code>yyyy-MM-dd</code></li>
 <li>time 时间类型 格式<code>hh:mm:aa</code></li>
 <li>timestamp 时间戳类型</li>
 </ul>
+<ol>
+<li>表</li>
+</ol>
+<ul>
+<li><p>创建表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE [IF NOT EXISTS] 表名(</span><br><span class="line">	列名 列类型,</span><br><span class="line">	列名 列类型,</span><br><span class="line">	列名 列类型,</span><br><span class="line">)；</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW TABLES;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看表结构<br><code>DESC 表名；</code></p>
+</li>
+<li>删除表<br><code>DROP TABLE 表名；</code></li>
+<li>修改<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">1. 添加列</span><br><span class="line">ALTER TABLE 表名 ADD(</span><br><span class="line">	列名 列类型,</span><br><span class="line">	列名 列类型,</span><br><span class="line">	列名 列类型,</span><br><span class="line">	);</span><br><span class="line"></span><br><span class="line">2. 改列类型（若列有数据，可能会影响已存在数据）</span><br><span class="line">ALTER TABLE 表明 MODIFY	列名 列类型;</span><br><span class="line"></span><br><span class="line">3. 修改列名</span><br><span class="line">ALTER TABLE 表名 CHANGE 原列名 新类名 列类型;</span><br><span class="line"></span><br><span class="line">4，删除类</span><br><span class="line">ALTER TABLE 表名 DROP 列名;</span><br><span class="line"></span><br><span class="line">5. 修改表名称</span><br><span class="line">ALTER TABLE 原表名 RENAME TO 新表名;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="DML"><a href="#DML" class="headerlink" title="DML"></a>DML</h2><ol>
+<li><p>插入数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO 表名(</span><br><span class="line">number, name, age, gender</span><br><span class="line">	)</span><br><span class="line">VALUES(</span><br><span class="line">&apos;ITCAST_00001&apos;, &apos;ZhangSan&apos;, 27, &apos;male&apos;</span><br><span class="line">	)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">update tb_stu set age = 18,sex=&apos;male&apos;</span><br><span class="line">where name=&apos;ZhangSan&apos; or name in(&apos;wang&apos;,&apos;lisi&apos;)</span><br><span class="line"></span><br><span class="line">运算符： = != &lt;&gt; &gt; &lt; &gt;= &lt;= BETWEEN..AND..  IN(..) 	IS NULL		NOT OR AND</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">delete from 表名 where ...</span><br></pre></td></tr></table></figure></li>
+</ol>
 
           
         
@@ -1499,154 +1667,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/Python-基于事件驱动的回溯测试part5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="王老俺">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="王老俺">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/28/Python-基于事件驱动的回溯测试part5/" itemprop="url">Python:基于事件驱动的回溯测试part5</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T11:00:01+08:00">
-                2018-03-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>在前面关于事件驱动的回溯测试的文章中，我们考虑了如何构建一个Strategy类层次结构。这里定义的策略用于生成信号，供投资组合对象使用，以便决定是否发送订单。和以前一样，创建一个Portfolio抽象基类（ABC）是所有后续的子类继承自然的。</p>
-<p>本文描述了一个NaivePortfolio对象，用于跟踪投资组合中的头寸，并基于信号生成固定数量的股票订单。后来的投资组合对象将包括更复杂的风险管理工具，并将成为后续文章的主题。</p>
-<h1 id="位置跟踪和订单管理"><a href="#位置跟踪和订单管理" class="headerlink" title="位置跟踪和订单管理"></a>位置跟踪和订单管理</h1><p>投资组合订单管理系统可能是事件驱动的后台测试人员中最复杂的组成部分。其作用是跟踪所有当前市场头寸以及头寸的市场价值（称为“持股量”）。这仅仅是对该头寸的清算价值的估计，部分来自后台数据处理设施。</p>
-<p>除了仓位和持仓管理之外，投资组合还必须了解风险因素和仓位大小调整技术，以优化发送给经纪商或其他市场准入的订单。</p>
-<p>继续在Event类层次结构中，Portfolio对象必须能够处理SignalEvent对象，生成OrderEvent对象并解释FillEvent对象以更新位置。因此，就Portfolio代码行（LOC）而言，对象通常是事件驱动系统的最大组件，这并不奇怪。</p>
-<h1 id="履行"><a href="#履行" class="headerlink" title="履行"></a>履行</h1><p>我们创建一个新文件portfolio.py并导入必要的库。这些与大多数其他抽象基类实现相同。我们需要floor从math库中导入函数以生成整数值的订单大小。我们还需要这两个句柄FillEvent和OrderEvent对象Portfolio。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">import datetime</span><br><span class="line">import numpy as np</span><br><span class="line">import pandas as pd</span><br><span class="line">import Queue</span><br><span class="line"></span><br><span class="line">from abc import ABCMeta, abstractmethod</span><br><span class="line">from math import floor</span><br><span class="line"></span><br><span class="line">from event import FillEvent, OrderEvent</span><br></pre></td></tr></table></figure></p>
-<p>正如之前我们创建了一个ABC的Portfolio，有两个纯虚方法update_signal和update_fill。前者处理从事件队列中抓取的新交易信号，后者处理从执行处理程序对象收到的填充信号。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">class Portfolio(object):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    The Portfolio class handles the positions and market</span><br><span class="line">    value of all instruments at a resolution of a &quot;bar&quot;,</span><br><span class="line">    i.e. secondly, minutely, 5-min, 30-min, 60 min or EOD.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    __metaclass__ = ABCMeta</span><br><span class="line"></span><br><span class="line">    @abstractmethod</span><br><span class="line">    def update_signal(self, event):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Acts on a SignalEvent to generate new orders </span><br><span class="line">        based on the portfolio logic.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        raise NotImplementedError(&quot;Should implement update_signal()&quot;)</span><br><span class="line"></span><br><span class="line">    @abstractmethod</span><br><span class="line">    def update_fill(self, event):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Updates the portfolio current positions and holdings </span><br><span class="line">        from a FillEvent.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        raise NotImplementedError(&quot;Should implement update_fill()&quot;)</span><br></pre></td></tr></table></figure></p>
-<p>这篇文章的主要内容是NaivePortfolio课程。它旨在处理头寸大小和当前持有量，但只需将其直接发送给具有预定数量规模的经纪商，以“哑”方式执行交易订单，而不管持有现金。这些都是不切实际的假设，但它们有助于概述投资组合订单管理系统（OMS）如何以事件驱动的方式运作。</p>
-<p>这NaivePortfolio需要一个初始资本值，我已经设定为10万美元的默认值。它还需要开始日期时间。</p>
-<p>投资组合包含all_positions和current_positions成员。前者存储在市场数据事件的时间戳记录的所有先前头寸的列表。一个头寸就是资产的数量。负面情绪意味着资产被缩短。后者成员存储一个包含上次市场栏更新的当前头寸的字典。</p>
-<p>除了仓位成员之外，投资组合还储存仓位，这些仓位描述了持仓头寸的当前市场价值。在这种情况下，“当前市场价值”意味着从当前市场价格中获得的收盘价，这显然是一种近似值，但暂时足够合理。all_holdings存储所有符号持有量的历史列表，同时current_holdings存储所有符号持有量值的最新字典<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">class NaivePortfolio(Portfolio):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    The NaivePortfolio object is designed to send orders to</span><br><span class="line">    a brokerage object with a constant quantity size blindly,</span><br><span class="line">    i.e. without any risk management or position sizing. It is</span><br><span class="line">    used to test simpler strategies such as BuyAndHoldStrategy.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    </span><br><span class="line">    def __init__(self, bars, events, start_date, initial_capital=100000.0):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Initialises the portfolio with bars and an event queue. </span><br><span class="line">        Also includes a starting datetime index and initial capital </span><br><span class="line">        (USD unless otherwise stated).</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        bars - The DataHandler object with current market data.</span><br><span class="line">        events - The Event Queue object.</span><br><span class="line">        start_date - The start date (bar) of the portfolio.</span><br><span class="line">        initial_capital - The starting capital in USD.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        self.bars = bars</span><br><span class="line">        self.events = events</span><br><span class="line">        self.symbol_list = self.bars.symbol_list</span><br><span class="line">        self.start_date = start_date</span><br><span class="line">        self.initial_capital = initial_capital</span><br><span class="line">        </span><br><span class="line">        self.all_positions = self.construct_all_positions()</span><br><span class="line">        self.current_positions = dict( (k,v) for k, v in [(s, 0) for s in self.symbol_list] )</span><br><span class="line"></span><br><span class="line">        self.all_holdings = self.construct_all_holdings()</span><br><span class="line">        self.current_holdings = self.construct_current_holdings()</span><br></pre></td></tr></table></figure></p>
-<p>下面的方法construct_all_positions简单地为每个符号创建一个字典，将每个符号的值设置为零，然后添加一个日期时间密钥，最后将其添加到列表中。它使用了词典理解，其精神类似于列表理解：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def construct_all_positions(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Constructs the positions list using the start_date</span><br><span class="line">        to determine when the time index will begin.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        d = dict( (k,v) for k, v in [(s, 0) for s in self.symbol_list] )</span><br><span class="line">        d[&apos;datetime&apos;] = self.start_date</span><br><span class="line">        return [d]</span><br></pre></td></tr></table></figure></p>
-<p>T该construct_all_holdings方法与上述类似，但增加了现金，佣金和总额的额外密钥，分别代表任何购买后账户中的闲置现金，累计佣金以及包括现金和未平仓头寸在内的总账户权益。空头头寸被视为否定。起始现金和总账户资产均设为初始资本：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def construct_all_holdings(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Constructs the holdings list using the start_date</span><br><span class="line">        to determine when the time index will begin.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        d = dict( (k,v) for k, v in [(s, 0.0) for s in self.symbol_list] )</span><br><span class="line">        d[&apos;datetime&apos;] = self.start_date</span><br><span class="line">        d[&apos;cash&apos;] = self.initial_capital</span><br><span class="line">        d[&apos;commission&apos;] = 0.0</span><br><span class="line">        d[&apos;total&apos;] = self.initial_capital</span><br><span class="line">        return [d]</span><br></pre></td></tr></table></figure>
-<p>以下方法construct_current_holdings与上述方法几乎相同，只是它不会将字典包装在列表中：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def construct_current_holdings(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        This constructs the dictionary which will hold the instantaneous</span><br><span class="line">        value of the portfolio across all symbols.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        d = dict( (k,v) for k, v in [(s, 0.0) for s in self.symbol_list] )</span><br><span class="line">        d[&apos;cash&apos;] = self.initial_capital</span><br><span class="line">        d[&apos;commission&apos;] = 0.0</span><br><span class="line">        d[&apos;total&apos;] = self.initial_capital</span><br><span class="line">        return d</span><br></pre></td></tr></table></figure>
-<p>在每次“心跳”时，即每次从DataHandler对象请求新的市场数据时，投资组合必须更新所有持仓的当前市场价值。在实时交易场景中，可以直接从经纪商下载并解析此信息，但对于回溯测试，需要手动计算这些值。</p>
-<p>不幸的是，由于买/卖差价和流动性问题，没有任何东西可以作为“当前市场价值”。因此，有必要通过将所持资产的数量乘以“价格”来进行估计。我在这里采取的方法是使用收到的最后一栏的收盘价。对于盘中策略来说，这是相对现实的。对于日常策略而言，这是不现实的，因为开盘价格可能与收盘价格有很大差异。</p>
-<p>该方法update_timeindex处理新的持股追踪。它首先从市场数据处理程序获取最新价格，并通过将“新”位置设置为等于“当前”头寸来创建代表当前头寸的新符号字典。这些仅在FillEvent获得a后才会发生变化，稍后会在投资组合中处理。该方法然后将这组当前位置附加到all_positions列表。接下来，股票以类似的方式更新，除了通过将当前头寸数量乘以最新股票的收盘价（self.current_positions[s] * bars[s][0][5]）来重新计算市场价值。最后，新的资产被追加到all_holdings：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def update_timeindex(self, event):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Adds a new record to the positions matrix for the current </span><br><span class="line">        market data bar. This reflects the PREVIOUS bar, i.e. all</span><br><span class="line">        current market data at this stage is known (OLHCVI).</span><br><span class="line"></span><br><span class="line">        Makes use of a MarketEvent from the events queue.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        bars = &#123;&#125;</span><br><span class="line">        for sym in self.symbol_list:</span><br><span class="line">            bars[sym] = self.bars.get_latest_bars(sym, N=1)</span><br><span class="line"></span><br><span class="line">        # Update positions</span><br><span class="line">        dp = dict( (k,v) for k, v in [(s, 0) for s in self.symbol_list] )</span><br><span class="line">        dp[&apos;datetime&apos;] = bars[self.symbol_list[0]][0][1]</span><br><span class="line"></span><br><span class="line">        for s in self.symbol_list:</span><br><span class="line">            dp[s] = self.current_positions[s]</span><br><span class="line"></span><br><span class="line">        # Append the current positions</span><br><span class="line">        self.all_positions.append(dp)</span><br><span class="line"></span><br><span class="line">        # Update holdings</span><br><span class="line">        dh = dict( (k,v) for k, v in [(s, 0) for s in self.symbol_list] )</span><br><span class="line">        dh[&apos;datetime&apos;] = bars[self.symbol_list[0]][0][1]</span><br><span class="line">        dh[&apos;cash&apos;] = self.current_holdings[&apos;cash&apos;]</span><br><span class="line">        dh[&apos;commission&apos;] = self.current_holdings[&apos;commission&apos;]</span><br><span class="line">        dh[&apos;total&apos;] = self.current_holdings[&apos;cash&apos;]</span><br><span class="line"></span><br><span class="line">        for s in self.symbol_list:</span><br><span class="line">            # Approximation to the real value</span><br><span class="line">            market_value = self.current_positions[s] * bars[s][0][5]</span><br><span class="line">            dh[s] = market_value</span><br><span class="line">            dh[&apos;total&apos;] += market_value</span><br><span class="line"></span><br><span class="line">        # Append the current holdings</span><br><span class="line">        self.all_holdings.append(dh)</span><br></pre></td></tr></table></figure></p>
-<p>该方法update_positions_from_fill确定a FillEvent是买入还是卖出，然后current_positions通过增加/减少正确数量的股票来相应地更新词典：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def update_positions_from_fill(self, fill):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Takes a FilltEvent object and updates the position matrix</span><br><span class="line">        to reflect the new position.</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        fill - The FillEvent object to update the positions with.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        # Check whether the fill is a buy or sell</span><br><span class="line">        fill_dir = 0</span><br><span class="line">        if fill.direction == &apos;BUY&apos;:</span><br><span class="line">            fill_dir = 1</span><br><span class="line">        if fill.direction == &apos;SELL&apos;:</span><br><span class="line">            fill_dir = -1</span><br><span class="line"></span><br><span class="line">        # Update positions list with new quantities</span><br><span class="line">        self.current_positions[fill.symbol] += fill_dir*fill.quantity</span><br></pre></td></tr></table></figure></p>
-<p>相应的update_holdings_from_fill方法类似于上述方法，但改为更新持有值。为了模拟填充的成本，以下方法不使用与之相关的成本FillEvent。为什么是这样？简单地说，在回测环境中，填充费用实际上是未知的，因此必须进行估计。因此，填充成本被设置为“当前市价”（最后一栏的收盘价）。然后将特定符号的持有量设置为等于填充成本乘以交易量。</p>
-<p>一旦知道填充成本，当前持有量，现金和总价值都可以更新。累积佣金也会更新：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def update_holdings_from_fill(self, fill):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Takes a FillEvent object and updates the holdings matrix</span><br><span class="line">        to reflect the holdings value.</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        fill - The FillEvent object to update the holdings with.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        # Check whether the fill is a buy or sell</span><br><span class="line">        fill_dir = 0</span><br><span class="line">        if fill.direction == &apos;BUY&apos;:</span><br><span class="line">            fill_dir = 1</span><br><span class="line">        if fill.direction == &apos;SELL&apos;:</span><br><span class="line">            fill_dir = -1</span><br><span class="line"></span><br><span class="line">        # Update holdings list with new quantities</span><br><span class="line">        fill_cost = self.bars.get_latest_bars(fill.symbol)[0][5]  # Close price</span><br><span class="line">        cost = fill_dir * fill_cost * fill.quantity</span><br><span class="line">        self.current_holdings[fill.symbol] += cost</span><br><span class="line">        self.current_holdings[&apos;commission&apos;] += fill.commission</span><br><span class="line">        self.current_holdings[&apos;cash&apos;] -= (cost + fill.commission)</span><br><span class="line">        self.current_holdings[&apos;total&apos;] -= (cost + fill.commission)</span><br></pre></td></tr></table></figure></p>
-<p>update_fill来自PortfolioABC 的纯虚拟方法在这里实现。它只是执行前面两个方法，update_positions_from_fill并且update_holdings_from_fill已经在上面讨论过了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def update_fill(self, event):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Updates the portfolio current positions and holdings </span><br><span class="line">        from a FillEvent.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        if event.type == &apos;FILL&apos;:</span><br><span class="line">            self.update_positions_from_fill(event)</span><br><span class="line">            self.update_holdings_from_fill(event)</span><br></pre></td></tr></table></figure></p>
-<p>当Portfolio物体必须处理FillEvents时，它也必须OrderEvent在接收到一个或多个SignalEvents时处理s。该generate_naive_order方法只是简单地发出一个信号来延长或缩短资产，然后发送一个命令来为100个这样的资产分配资金。显然100是一个任意值。在实际的实施中，这个值将由风险管理或职位大小覆盖决定。然而，这是一个NaivePortfolio，所以它“天真地”从信号直接发送所有的订单，没有风险系统。</p>
-<p>该方法基于当前数量和特定符号处理渴望，短暂和退出某个头寸。OrderEvent然后生成相应的对象：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def generate_naive_order(self, signal):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Simply transacts an OrderEvent object as a constant quantity</span><br><span class="line">        sizing of the signal object, without risk management or</span><br><span class="line">        position sizing considerations.</span><br><span class="line"></span><br><span class="line">        Parameters:</span><br><span class="line">        signal - The SignalEvent signal information.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        order = None</span><br><span class="line"></span><br><span class="line">        symbol = signal.symbol</span><br><span class="line">        direction = signal.signal_type</span><br><span class="line">        strength = signal.strength</span><br><span class="line"></span><br><span class="line">        mkt_quantity = floor(100 * strength)</span><br><span class="line">        cur_quantity = self.current_positions[symbol]</span><br><span class="line">        order_type = &apos;MKT&apos;</span><br><span class="line"></span><br><span class="line">        if direction == &apos;LONG&apos; and cur_quantity == 0:</span><br><span class="line">            order = OrderEvent(symbol, order_type, mkt_quantity, &apos;BUY&apos;)</span><br><span class="line">        if direction == &apos;SHORT&apos; and cur_quantity == 0:</span><br><span class="line">            order = OrderEvent(symbol, order_type, mkt_quantity, &apos;SELL&apos;)   </span><br><span class="line">    </span><br><span class="line">        if direction == &apos;EXIT&apos; and cur_quantity &gt; 0:</span><br><span class="line">            order = OrderEvent(symbol, order_type, abs(cur_quantity), &apos;SELL&apos;)</span><br><span class="line">        if direction == &apos;EXIT&apos; and cur_quantity &lt; 0:</span><br><span class="line">            order = OrderEvent(symbol, order_type, abs(cur_quantity), &apos;BUY&apos;)</span><br><span class="line">        return order</span><br></pre></td></tr></table></figure></p>
-<p>该update_signal方法只需调用上述方法并将生成的顺序添加到事件队列中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def update_signal(self, event):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Acts on a SignalEvent to generate new orders </span><br><span class="line">        based on the portfolio logic.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        if event.type == &apos;SIGNAL&apos;:</span><br><span class="line">            order_event = self.generate_naive_order(event)</span><br><span class="line">            self.events.put(order_event)</span><br></pre></td></tr></table></figure></p>
-<p>最终的方法NaivePortfolio是产生一个权益曲线。这只是创建一个回报流，对性能计算有用，然后将权益曲线标准化为基于百分比。因此帐户初始大小等于1.0：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># portfolio.py</span><br><span class="line"></span><br><span class="line">    def create_equity_curve_dataframe(self):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        Creates a pandas DataFrame from the all_holdings</span><br><span class="line">        list of dictionaries.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        curve = pd.DataFrame(self.all_holdings)</span><br><span class="line">        curve.set_index(&apos;datetime&apos;, inplace=True)</span><br><span class="line">        curve[&apos;returns&apos;] = curve[&apos;total&apos;].pct_change()</span><br><span class="line">        curve[&apos;equity_curve&apos;] = (1.0+curve[&apos;returns&apos;]).cumprod()</span><br><span class="line">        self.equity_curve = curve</span><br></pre></td></tr></table></figure></p>
-<p>该Portfolio对象是整个事件驱动的回溯系统中最复杂的一个方面。这里的实施虽然错综复杂，但在处理头寸方面相对较为单一。后期版本将考虑风险管理和职位大小，这将导致对战略绩效更为现实的想法。</p>
-<p>在下一篇文章中，我们将考虑事件驱动的后台测试器的最后一部分，即一个ExecutionHandler对象，它用于获取OrderEvent对象并FillEvent从中创建对象。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1697,7 +1717,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
